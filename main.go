@@ -69,10 +69,10 @@ func calcCPUUsage() float64 {
 }
 
 // CPUChecker to check cpu usage
-func CPUChecker() health.Checker {
+func CPUChecker(maxCPU float64) health.Checker {
 	return health.CheckFunc(func() error {
 		cpuUsage := calcCPUUsage()
-		if cpuUsage > 20.0 {
+		if cpuUsage > maxCPU {
 			return errors.New("High CPU Usage")
 		}
 		return nil
@@ -81,7 +81,7 @@ func CPUChecker() health.Checker {
 
 func main() {
 	health.Register("tcpCheck", health.PeriodicChecker(TCPChecker("127.0.0.1:8000", time.Second*5), time.Second*5))
-	health.Register("cpuCheck", health.PeriodicChecker(CPUChecker(), time.Second*5))
+	health.Register("cpuCheck", health.PeriodicChecker(CPUChecker(20), time.Second*5))
 	http.HandleFunc("/", handler)
 	http.ListenAndServe(":8080", nil)
 }
